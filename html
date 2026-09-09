@@ -1,0 +1,313 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PhytoAir Water System Dashboard</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div class="app-shell">
+<aside class="sidebar">
+<div class="brand">
+<img class="brand-logo" src="phytoair-logo.jpeg" alt="PhytoAir" />
+</div>
+
+
+<nav class="nav" aria-label="Main navigation">
+<a class="active" href="#dashboard">Dashboard</a>
+<a href="#sensors">Sensors</a>
+<a href="#control">Control</a>
+<a href="#alerts">Alerts</a>
+</nav>
+
+
+<div class="system-card mini">
+<span class="pulse"></span>
+<div>
+<strong id="connectionStatus">System Online</strong>
+<small>Last sync: <span id="lastSync">just now</span></small>
+</div>
+</div>
+
+
+<div class="quick-stats">
+<div>
+<small>Mode</small>
+<strong id="currentMode">Auto</strong>
+</div>
+<div>
+<small>Active Alerts</small>
+<strong id="activeAlertCount">2</strong>
+</div>
+</div>
+</aside>
+
+
+<main class="main">
+<header class="topbar">
+<div>
+<p class="eyebrow">Live monitoring dashboard</p>
+<h2>Algae-Based Water System</h2>
+</div>
+<div class="topbar-actions">
+<button class="ghost-btn" id="simulateProblemBtn">Simulate Problem</button>
+<button class="primary-btn" id="refreshBtn">Refresh Data</button>
+</div>
+</header>
+
+
+<section id="dashboard" class="hero-panel">
+<div>
+<p class="eyebrow">Overall health</p>
+<h3 id="healthScore">92%</h3>
+<p class="hero-text" id="healthText">PhytoAir is stable. Algae growth, water quality, and flow rate are within safe ranges.</p>
+<div class="health-tags">
+<span id="growthTag">Growth: Healthy</span>
+<span id="waterTag">Water: Clean</span>
+<span id="controlTag">Controls: Auto</span>
+</div>
+</div>
+<div class="status-orb" aria-label="System health score">
+<div class="orb-inner" id="orbLabel">Healthy</div>
+</div>
+</section>
+
+
+<section id="sensors" class="section-block">
+<div class="section-title section-title-row">
+<div>
+<p class="eyebrow">Sensors</p>
+<h3>Live Sensor Network</h3>
+</div>
+<button class="ghost-btn" id="calibrateSensorsBtn">Calibrate Sensors</button>
+</div>
+
+
+<div class="grid cards-grid">
+<article class="sensor-card" data-type="ph">
+<div class="card-head"><span>pH Level</span><strong id="phValue">7.4</strong></div>
+<div class="progress"><span id="phBar"></span></div>
+<small>Ideal range: 6.8 - 8.2</small>
+</article>
+
+
+<article class="sensor-card" data-type="temp">
+<div class="card-head"><span>Temperature</span><strong id="tempValue">25.8°C</strong></div>
+<div class="progress"><span id="tempBar"></span></div>
+<small>Ideal range: 20°C - 30°C</small>
+</article>
+
+
+<article class="sensor-card" data-type="oxygen">
+<div class="card-head"><span>Dissolved Oxygen</span><strong id="oxygenValue">8.2 mg/L</strong></div>
+<div class="progress"><span id="oxygenBar"></span></div>
+<small>Good range: 6 - 12 mg/L</small>
+</article>
+
+
+<article class="sensor-card" data-type="turbidity">
+<div class="card-head"><span>Turbidity</span><strong id="turbidityValue">12 NTU</strong></div>
+<div class="progress"><span id="turbidityBar"></span></div>
+<small>Lower value means clearer water</small>
+</article>
+
+
+<article class="sensor-card" data-type="chlorophyll">
+<div class="card-head"><span>Algae Density</span><strong id="chlorophyllValue">42 µg/L</strong></div>
+<div class="progress"><span id="chlorophyllBar"></span></div>
+<small>Estimated from LDR light transmission</small>
+</article>
+
+
+<article class="sensor-card" data-type="flow">
+<div class="card-head"><span>Flow Rate</span><strong id="flowValue">3.4 L/min</strong></div>
+<div class="progress"><span id="flowBar"></span></div>
+<small>Target range: 2 - 5 L/min</small>
+</article>
+
+
+<article class="sensor-card" data-type="water">
+<div class="card-head"><span>Water Level</span><strong id="waterLevelValue">82%</strong></div>
+<div class="progress"><span id="waterLevelBar"></span></div>
+<small>Keep above 40%</small>
+</article>
+
+
+<article class="sensor-card" data-type="co2">
+<div class="card-head"><span>CO₂ Level</span><strong id="co2LevelValue">420 ppm</strong></div>
+<div class="progress"><span id="co2LevelBar"></span></div>
+<small>Estimated from MQ-135 sensors</small>
+</article>
+</div>
+</section>
+
+
+<section class="grid lower-grid">
+<article class="panel chart-panel">
+<div class="section-title">
+<div>
+<p class="eyebrow">Trend</p>
+<h3>Sensor History</h3>
+</div>
+<select id="chartMode" aria-label="Choose chart sensor">
+<option value="co2Level">CO₂ Estimate</option>
+<option value="mqInput">MQ-135 Input</option>
+<option value="mqOutput">MQ-135 Output</option>
+<option value="ldr">LDR Light</option>
+<option value="chlorophyll">Algae Density</option>
+<option value="ph">pH</option>
+<option value="temp">Temperature</option>
+<option value="oxygen">Oxygen</option>
+<option value="turbidity">Turbidity</option>
+<option value="flow">Flow Rate</option>
+</select>
+</div>
+<canvas id="qualityChart" width="900" height="360"></canvas>
+</article>
+
+
+<article class="panel sensor-table-panel">
+<div class="section-title">
+<div>
+<p class="eyebrow">Diagnostics</p>
+<h3>Sensor Status</h3>
+</div>
+</div>
+<div class="sensor-table" id="sensorStatusTable"></div>
+</article>
+</section>
+
+
+<section id="control" class="panel control-panel full-panel">
+<div class="section-title section-title-row">
+<div>
+<p class="eyebrow">Control center</p>
+<h3>System Controls</h3>
+</div>
+<div class="mode-buttons" role="group" aria-label="Control mode">
+<button class="mode-btn active" data-mode="Auto">Auto</button>
+<button class="mode-btn" data-mode="Manual">Manual</button>
+<button class="mode-btn" data-mode="Night">Night</button>
+</div>
+</div>
+
+
+<div class="control-grid">
+<div class="control-column">
+<div class="control-row">
+<div><strong>Water Pump</strong><small>Circulates water through the algae reactor</small></div>
+<label class="switch"><input type="checkbox" id="pumpToggle" checked><span></span></label>
+</div>
+
+
+<div class="control-row">
+<div><strong>Grow Lights</strong><small>Controls algae photosynthesis lighting</small></div>
+<label class="switch"><input type="checkbox" id="lightToggle" checked><span></span></label>
+</div>
+
+
+<div class="control-row">
+<div><strong>CO₂ Injector</strong><small>Feeds carbon dioxide into the system</small></div>
+<label class="switch"><input type="checkbox" id="co2Toggle"><span></span></label>
+</div>
+
+
+<div class="control-row">
+<div><strong>Aerator</strong><small>Boosts dissolved oxygen when oxygen is low</small></div>
+<label class="switch"><input type="checkbox" id="aeratorToggle" checked><span></span></label>
+</div>
+
+
+<div class="control-row">
+<div><strong>Nutrient Doser</strong><small>Adds nutrients for controlled algae growth</small></div>
+<label class="switch"><input type="checkbox" id="doserToggle"><span></span></label>
+</div>
+</div>
+
+
+<div class="control-column">
+<label class="slider-label">
+Pump Speed: <strong><span id="pumpSpeedLabel">65</span>%</strong>
+<input type="range" id="pumpSpeed" min="0" max="100" value="65" />
+</label>
+
+
+<label class="slider-label">
+Light Intensity: <strong><span id="lightIntensityLabel">78</span>%</strong>
+<input type="range" id="lightIntensity" min="0" max="100" value="78" />
+</label>
+
+
+<label class="slider-label">
+CO₂ Injection Rate: <strong><span id="co2RateLabel">30</span>%</strong>
+<input type="range" id="co2Rate" min="0" max="100" value="30" />
+</label>
+
+
+<label class="slider-label">
+Nutrient Dose: <strong><span id="nutrientDoseLabel">12</span> ml</strong>
+<input type="range" id="nutrientDose" min="0" max="50" value="12" />
+</label>
+
+
+<label class="slider-label">
+Target pH: <strong><span id="targetPhLabel">7.4</span></strong>
+<input type="range" id="targetPh" min="62" max="88" value="74" />
+</label>
+</div>
+</div>
+
+
+<div class="action-strip">
+<button class="primary-btn" id="runCleanCycle">Run Clean Cycle</button>
+<button class="ghost-btn" id="primePumpBtn">Prime Pump</button>
+<button class="ghost-btn" id="doseNutrientsBtn">Dose Nutrients</button>
+<button class="danger-btn compact-danger" id="emergencyStop">Emergency Stop</button>
+</div>
+</section>
+
+
+<section id="alerts" class="panel alerts-panel full-panel">
+<div class="section-title section-title-row">
+<div>
+<p class="eyebrow">Alerts</p>
+<h3>System Alerts & Safety Rules</h3>
+</div>
+<div class="alert-actions">
+<button class="ghost-btn" id="testAlertBtn">Test Alert</button>
+<button class="ghost-btn" id="clearAlerts">Clear</button>
+</div>
+</div>
+
+
+<div class="alert-layout">
+<div>
+<h4>Live Alert Log</h4>
+<div id="alertsList" class="alerts-list"></div>
+</div>
+
+
+<div>
+<h4>Safety Rules</h4>
+<div class="rules-list">
+<div class="rule-card"><strong>MQ-135 Warning</strong><span>Above 2500 ADC</span></div>
+<div class="rule-card"><strong>Low LDR</strong><span>Below 1000 ADC</span></div>
+<div class="rule-card"><strong>pH Warning</strong><span>Below 6.8 or above 8.2</span></div>
+<div class="rule-card"><strong>Low Oxygen</strong><span>Below 6 mg/L</span></div>
+<div class="rule-card"><strong>High Turbidity</strong><span>Above 30 NTU</span></div>
+<div class="rule-card"><strong>Low Water</strong><span>Below 40%</span></div>
+</div>
+</div>
+</div>
+</section>
+</main>
+</div>
+
+
+<script type="module" src="app.js"></script>
+</body>
+</html>
+
+
